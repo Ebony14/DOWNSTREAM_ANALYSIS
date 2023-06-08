@@ -1,0 +1,95 @@
+---
+title: "GENE ONTOLOGY"
+author: "Rofiah Adeyemi"
+date: "`r Sys.Date()`"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+# READ THE CONSISTENTLY EXPRESSED GENES
+```{r}
+sigsPE <- read.csv("C:/Users/rofia/Downloads/project data/ConsistentlyExpGenesPE.csv", row.names = 1)
+sigsNP <- read.csv("C:/Users/rofia/Downloads/project data/ConsistentlyExpGenesNP.csv", row.names = 1)
+```
+
+
+# VISUALIZE THE GENES
+```{r}
+sigsPE
+sigsNP
+```
+
+
+#INSTALL THE REQUIRED PACKAGES
+```{r}
+#if (!require("BiocManager", quietly = TRUE))
+    #install.packages("BiocManager")
+
+#BiocManager::install("clusterProfiler")
+
+#if (!require("BiocManager", quietly = TRUE))
+    #install.packages("BiocManager")
+
+#BiocManager::install("AnnotationDbi", force = TRUE)
+
+#if (!require("BiocManager", quietly = TRUE))
+    #install.packages("BiocManager")
+
+#BiocManager::install("org.Hs.eg.db")
+```
+
+
+Note: fgsea needs to be installed and loaded for clusterprofiler to work
+```{r}
+# install.packages("fgsea")
+#BiocManager::install("fgsea", force = TRUE)
+```
+
+# LOAD THE REQUIRED PACKAGES
+```{r}
+library(clusterProfiler)
+library(org.Hs.eg.db)
+library(AnnotationDbi)
+```
+
+
+# ASSIGN THE GENE ids TO A VARIABLE
+```{r}
+genes_to_testNP <- rownames(sigsNP)
+genes_to_testPE <- rownames(sigsPE)
+```
+
+
+# PERFROM THE GENE ONTOLOGY
+```{r}
+GO_resultsNP <- enrichGO(gene = genes_to_testNP, OrgDb = "org.Hs.eg.db", keyType = "ENSEMBL", ont = "BP") # BP = Biological property, CC= cellular component, MF = molecular function
+GO_resultsPE <- enrichGO(gene = genes_to_testPE, OrgDb = "org.Hs.eg.db", keyType = "ENSEMBL", ont = "BP")
+```
+
+# LOAD THE RESULT AS DATA FRAME
+```{r}
+as.data.frame(GO_resultsNP)
+as.data.frame(GO_resultsPE)
+```
+
+# VISUALIZE THE RESULT IN BARPLOT
+```{r}
+# BP for NP
+fit <- plot(barplot(GO_resultsNP, showCategory = 10)) # 10 DENOTES THE NUMBER OF GENES TO VIEW
+
+png("out.png", res = 250, width = 1400, height = 1800)
+print(fit)
+dev.off()
+```
+
+```{r}
+# BP for PE
+fit <- plot(barplot(GO_resultsPE, showCategory = 10))
+
+png("out.png", res = 250, width = 1400, height = 1800)
+print(fit)
+dev.off()
+```
+
